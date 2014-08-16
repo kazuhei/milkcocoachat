@@ -5,15 +5,34 @@ var bearDataStore = milkcocoa.dataStore("bear");
 enchant();
 
 window.onload = function(){
-
-	console.log('hello enchantjs');
-	var core = new Core(320, 320);
+    console.log('hello enchantjs');
+    console.log(username);
+	var core = new Core(400, 400);
 	core.preload('chara1.png');
 	core.fps = 6;
 	core.onload = function(){
-
-        // <--- object configuration -->
         
+        // <--- object configuration -->
+        // 便利クラス
+        var util = {
+            getQueryString: function(){
+                var result = {};
+                if( 1 < window.location.search.length )
+                {
+                    var query = window.location.search.substring( 1 );
+                    var parameters = query.split( '&' );
+                    for( var i = 0; i < parameters.length; i++ )
+                    {
+                        var element = parameters[ i ].split( '=' );
+                        var paramName = decodeURIComponent( element[ 0 ] );
+                        var paramValue = decodeURIComponent( element[ 1 ] );
+                        result[ paramName ] = paramValue;
+                    }
+                }
+                return result;
+            }
+        }
+
         // bearを管理するクラス
         var bearManager = {
             bearList: {},
@@ -48,9 +67,9 @@ window.onload = function(){
 			        if(core.input.up){this.y -= 5;}
     	    		if(core.input.down){this.y += 5;}
 	        		this.frame = this.age % 3;
-                    bearDataStore.child("arai").set(
+                    bearDataStore.child(username).set(
                         {
-                            name : 'arai',
+                            name : username,
                             x : this.x,
                             y : this.y
                         }
@@ -87,7 +106,9 @@ window.onload = function(){
         });
         
         // <-- object configuration /-->
-        
+        var queryObj = util.getQueryString();
+        var username = queryObj.username;
+
         var startScene = new GameScene('Game Start!', 'blue', '#EEE');
         var gameScene = new GameScene('','','#BBB');
         var myBear = new MyBear(0,0);
@@ -107,9 +128,11 @@ window.onload = function(){
         });
         core.pushScene(startScene);
         bearDataStore.on("set",function(data){
-            bear = bearManager.getBear(data.id);
-            bear.x = data.value.x;
-            bear.y = data.value.y;
+            if(username != data.id){
+                bear = bearManager.getBear(data.id);
+                bear.x = data.value.x;
+                bear.y = data.value.y;
+            }
         });
 	}
 	core.start();
