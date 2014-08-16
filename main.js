@@ -86,7 +86,9 @@ window.onload = function(){
                 this.x = x;
                 this.y = y;
                 this.image = core.assets['chara1.png'];
-                this.frame = 5;
+                this.on('enterframe', function(){
+                    this.frame = this.age % 3 + 5;
+                });
             }
         });
 
