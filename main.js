@@ -13,7 +13,7 @@ window.onload = function(){
 	core.onload = function(){
 
         // class difinition
-        var Bear = Class.create(Sprite, {
+        var MyBear = Class.create(Sprite, {
             initialize: function(x, y){
                 Sprite.call(this, 32, 32);
                 this.x = x;
@@ -33,6 +33,17 @@ window.onload = function(){
             }
         });
 
+        var OtherBear = Class.create(Sprite, {
+            initialize: function(x, y){
+                Sprite.call(this, 32, 32);
+                this.x = x;
+                this.y = y;
+                this.image = core.assets['chara1.png'];
+                gameScene.addChild(this);
+            }
+        });
+
+
         var GameScene = Class.create(Scene, {
             initialize: function(string, stringColor, backgroundColor){
                 Scene.call(this);
@@ -48,8 +59,15 @@ window.onload = function(){
         });
 
         var gameScene = new GameScene('','','#BBB');
-        var myBear = new Bear(0,0);
-
+        //var myBear = new MyBear(0,0);
+        bearDataStore.query().done(
+            function(bearPositions){
+                console.log(bearPositions);
+                $.each(bearPositions,function(i, position){
+                    console.log(position);
+                });
+            }
+        );
         var startScene = new GameScene('Game Start!', 'blue', '#EEE');
         startScene.on('touchstart', function(){
             core.pushScene(gameScene);
