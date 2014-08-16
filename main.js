@@ -12,7 +12,7 @@ window.onload = function(){
 	core.fps = 6;
 	core.onload = function(){
 
-        // class difinition
+        // <--- object configuration -->
         var MyBear = Class.create(Sprite, {
             initialize: function(x, y){
                 Sprite.call(this, 32, 32);
@@ -59,16 +59,20 @@ window.onload = function(){
                 this.addChild(label);
             }
         });
-
+        
+        var otherBears = {};
         bearDataStore.query().done(
-            function(bearPositions){
-                console.log(bearPositions);
-                $.each(bearPositions,function(i, position){
-                    var bear = new OtherBear(position.x, position.y);
+            function(bearData){
+                console.log(bearData);
+                $.each(bearData,function(i, bearRecord){
+                    var bear = new OtherBear(bearRecord.x, bearRecord.y);
                     gameScene.addChild(bear);
                 });
+                othreBears[bearRecord.id] = bear;
             }
         );
+        // <-- object configuration /-->
+        
         var startScene = new GameScene('Game Start!', 'blue', '#EEE');
         var gameScene = new GameScene('','','#BBB');
         var myBear = new MyBear(0,0);
@@ -77,7 +81,9 @@ window.onload = function(){
             core.pushScene(gameScene);
         });
         core.pushScene(startScene);
-
+        chatDataStore.on("set",function(data){
+            otherBears[data.value.id] = data.value;
+        });
 	}
 	core.start();
 };
