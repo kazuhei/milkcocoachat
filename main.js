@@ -25,11 +25,14 @@ window.onload = function(){
 			        if(core.input.up){this.y -= 5;}
     	    		if(core.input.down){this.y += 5;}
 	        		this.frame = this.age % 3;
-                    bearDataStore.push({x : this.x, y:this.y},function(data){                                    
-                          console.log("送信完了!");                                                             
-                    });
+                    bearDataStore.child("arai").set(
+                        {
+                            name : 'arai',
+                            x : this.x,
+                            y : this.y
+                        }
+                    );                
                 });
-                gameScene.addChild(this);
             }
         });
 
@@ -39,7 +42,6 @@ window.onload = function(){
                 this.x = x;
                 this.y = y;
                 this.image = core.assets['chara1.png'];
-                gameScene.addChild(this);
             }
         });
 
@@ -58,17 +60,19 @@ window.onload = function(){
             }
         });
 
-        var gameScene = new GameScene('','','#BBB');
-        //var myBear = new MyBear(0,0);
         bearDataStore.query().done(
             function(bearPositions){
                 console.log(bearPositions);
                 $.each(bearPositions,function(i, position){
-                    new OtherBear(position.x, position.y);
+                    var bear = new OtherBear(position.x, position.y);
+                    gameScene.addChild(bear);
                 });
             }
         );
         var startScene = new GameScene('Game Start!', 'blue', '#EEE');
+        var gameScene = new GameScene('','','#BBB');
+        var myBear = new MyBear(0,0);
+        gameScene.addChild(myBear);
         startScene.on('touchstart', function(){
             core.pushScene(gameScene);
         });
