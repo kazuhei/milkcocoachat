@@ -64,7 +64,7 @@ window.onload = function(){
             function(bearPositions){
                 console.log(bearPositions);
                 $.each(bearPositions,function(i, position){
-                    console.log(position);
+                    new OtherBear(position.x, position.y);
                 });
             }
         );
