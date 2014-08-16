@@ -1,9 +1,11 @@
 // configuration
 var milkcocoa = new MilkCocoa("https://io-ihyw9k58f.mlkcca.com");
-var bearDatastore = milkcocoa.dataStore("bear");
+var bearDataStore = milkcocoa.dataStore("bear");
+
 enchant();
 
 window.onload = function(){
+
 	console.log('hello enchantjs');
 	var core = new Core(320, 320);
 	core.preload('chara1.png');
@@ -25,7 +27,6 @@ window.onload = function(){
 	        		this.frame = this.age % 3;
                     bearDataStore.push({x : this.x, y:this.y},function(data){                                    
                           console.log("送信完了!");                                                             
-                          novel.textArea.val("");
                     });
                 });
                 gameScene.addChild(this);
