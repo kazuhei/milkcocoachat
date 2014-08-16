@@ -13,6 +13,29 @@ window.onload = function(){
 	core.onload = function(){
 
         // <--- object configuration -->
+        
+        // bearを管理するクラス
+        var bearManager = {
+            bearList: {},
+            addBear: function(bearDataObj){
+                bear = new OtherBear(bearDataObj.x, bearDataObj.y);
+                this.bearList[bearDataObj.id] = bear;
+                console.log('addBear');
+            },
+            getBear: function(key){
+                return this.bearList[key];
+            },
+            putBears: function(scene){
+                console.log(this.bearList);
+                for(var bearId in this.bearList){
+                    console.log(this.bearList[bearId]);
+                    scene.addChild(this.bearList[bearId]);
+                }
+                console.log('putBears');
+            },
+        }
+        
+        // 自分のbearのクラス 
         var MyBear = Class.create(Sprite, {
             initialize: function(x, y){
                 Sprite.call(this, 32, 32);
@@ -25,27 +48,30 @@ window.onload = function(){
 			        if(core.input.up){this.y -= 5;}
     	    		if(core.input.down){this.y += 5;}
 	        		this.frame = this.age % 3;
-                    bearDataStore.child("kawano").set(
+                    bearDataStore.child("arai").set(
                         {
-                            name : 'kawano',
+                            name : 'arai',
                             x : this.x,
                             y : this.y
                         }
-                    );                
+                    ); 
+                    console.log('mybareset');
                 });
             }
         });
 
+        // 他ユーザーのbearのクラス
         var OtherBear = Class.create(Sprite, {
             initialize: function(x, y){
                 Sprite.call(this, 32, 32);
                 this.x = x;
                 this.y = y;
                 this.image = core.assets['chara1.png'];
+                this.frame = 5;
             }
         });
 
-
+        // sceneのテンプレートクラス
         var GameScene = Class.create(Scene, {
             initialize: function(string, stringColor, backgroundColor){
                 Scene.call(this);
@@ -60,31 +86,30 @@ window.onload = function(){
             }
         });
         
-        var otherBears = {};
-        bearDataStore.query().done(
-            function(bearData){
-                console.log(bearData);
-                $.each(bearData,function(i, bearRecord){
-                    var bear = new OtherBear(bearRecord.x, bearRecord.y);
-                    otherBears[bearRecord.id] = bear;
-                    gameScene.addChild(bear);
-                });
-           }
-        );
         // <-- object configuration /-->
         
         var startScene = new GameScene('Game Start!', 'blue', '#EEE');
         var gameScene = new GameScene('','','#BBB');
         var myBear = new MyBear(0,0);
         gameScene.addChild(myBear);
+        // bearたちを登録
+        bearDataStore.query().done(
+            function(bearData){
+                console.log(bearData);
+                $.each(bearData,function(i, bearDataObj){
+                    bearManager.addBear(bearDataObj);
+                });
+                bearManager.putBears(gameScene);
+           }
+        );
         startScene.on('touchstart', function(){
             core.pushScene(gameScene);
         });
         core.pushScene(startScene);
         bearDataStore.on("set",function(data){
-            otherBears[data.value.id] = data.value;
-            console.log('set');
-
+            bear = bearManager.getBear(data.id);
+            bear.x = data.value.x;
+            bear.y = data.value.y;
         });
 	}
 	core.start();
