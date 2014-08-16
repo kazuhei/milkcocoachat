@@ -25,9 +25,9 @@ window.onload = function(){
 			        if(core.input.up){this.y -= 5;}
     	    		if(core.input.down){this.y += 5;}
 	        		this.frame = this.age % 3;
-                    bearDataStore.child("arai").set(
+                    bearDataStore.child("kawano").set(
                         {
-                            name : 'arai',
+                            name : 'kawano',
                             x : this.x,
                             y : this.y
                         }
@@ -66,10 +66,10 @@ window.onload = function(){
                 console.log(bearData);
                 $.each(bearData,function(i, bearRecord){
                     var bear = new OtherBear(bearRecord.x, bearRecord.y);
+                    otherBears[bearRecord.id] = bear;
                     gameScene.addChild(bear);
                 });
-                othreBears[bearRecord.id] = bear;
-            }
+           }
         );
         // <-- object configuration /-->
         
@@ -81,8 +81,10 @@ window.onload = function(){
             core.pushScene(gameScene);
         });
         core.pushScene(startScene);
-        chatDataStore.on("set",function(data){
+        bearDataStore.on("set",function(data){
             otherBears[data.value.id] = data.value;
+            console.log('set');
+
         });
 	}
 	core.start();
