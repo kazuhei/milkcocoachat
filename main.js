@@ -74,7 +74,7 @@ window.onload = function(){
                             y : this.y
                         }
                     ); 
-                    console.log('mybareset');
+                    console.log('mybearset');
                 });
             }
         });
@@ -116,7 +116,7 @@ window.onload = function(){
         var myBear = new MyBear(0,0);
         gameScene.addChild(myBear);
         // bearたちを登録
-        bearDataStore.query().done(
+        /*bearDataStore.query().done(
             function(bearData){
                 console.log(bearData);
                 $.each(bearData,function(i, bearDataObj){
@@ -124,7 +124,7 @@ window.onload = function(){
                 });
                 bearManager.putBears(gameScene);
            }
-        );
+        );*/
         startScene.on('touchstart', function(){
             core.pushScene(gameScene);
         });
@@ -132,8 +132,17 @@ window.onload = function(){
         bearDataStore.on("set",function(data){
             if(username != data.id){
                 bear = bearManager.getBear(data.id);
-                bear.x = data.value.x;
-                bear.y = data.value.y;
+                console.log(bear);
+                if(bear == undefined){
+                    dataObj={};
+                    dataObj.id=data.id;
+                    dataObj.x=data.value.x;
+                    dataObj.y=data.value.y;
+                    bearManager.addBear(dataObj);
+                }else {
+                    bear.x = data.value.x;
+                    bear.y = data.value.y;
+                }
             }
         });
 	}
