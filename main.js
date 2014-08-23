@@ -6,7 +6,7 @@ enchant();
 
 window.onload = function(){
     console.log('hello enchantjs');
-	var core = new Core(400, 400);
+	var core = new Core(320, 320);
 	core.preload('chara1.png', 'pipo-map001.png');
 	core.fps = 6;
 	core.onload = function(){
@@ -108,9 +108,35 @@ window.onload = function(){
 
         var startScene = new GameScene('Game Start!', 'blue', '#EEE');
         var gameScene = new GameScene('','','#BBB');
-        var bg1 = new Sprite(640, 480);
-        bg1.image = core.assets['pipo-map001.png'];
-        gameScene.addChild(bg1);
+        for(var i = 0; i < 10; i++){
+            for(var j = 0; j < 10; j++){
+                var bg = new Sprite(32, 32);
+                bg.image = core.assets['pipo-map001.png'];
+                bg.frame = 0;
+                bg.x = 0 + 32*i;
+                bg.y = 0 + 32*j;
+                gameScene.addChild(bg);
+            }
+        }
+        var tree = new Sprite(32, 32);
+        tree.image = core.assets['pipo-map001.png'];
+        tree.frame = 10;
+        tree.x = 32*6;
+        tree.y = 32*2;
+        gameScene.addChild(tree);
+        var tree2 = new Sprite(32, 32);
+        tree2.image = core.assets['pipo-map001.png'];
+        tree2.frame = 10;
+        tree2.x = 32*3;
+        tree2.y = 32*5;
+        gameScene.addChild(tree2);
+        var tree3 = new Sprite(32, 32);
+        tree3.image = core.assets['pipo-map001.png'];
+        tree3.frame = 10;
+        tree3.x = 32*1;
+        tree3.y = 32*3;
+        gameScene.addChild(tree3);
+
         var myBear = new MyBear(0,0);
         bearManager.addBear(username, myBear);
         gameScene.addChild(myBear); 
