@@ -6,9 +6,8 @@ enchant();
 
 window.onload = function(){
     console.log('hello enchantjs');
-    console.log(username);
 	var core = new Core(400, 400);
-	core.preload('chara1.png');
+	core.preload('chara1.png', 'pipo-map001.png');
 	core.fps = 6;
 	core.onload = function(){
         
@@ -36,21 +35,18 @@ window.onload = function(){
         // bearを管理するクラス
         var bearManager = {
             bearList: {},
-            addBear: function(bearDataObj){
-                bear = new OtherBear(bearDataObj.x, bearDataObj.y);
-                this.bearList[bearDataObj.id] = bear;
+            addBear: function(username, bearObj){
+                this.bearList[username] = bearObj;
                 console.log('addBear');
+                return bearObj;
             },
             getBear: function(key){
                 return this.bearList[key];
             },
-            putBears: function(scene){
-                console.log(this.bearList);
-                for(var bearId in this.bearList){
-                    console.log(this.bearList[bearId]);
-                    scene.addChild(this.bearList[bearId]);
-                }
-                console.log('putBears');
+            removeBears: function(scene){
+                $.each(bearList, function(username, bear){
+                    scene.removeChild(bear);
+                });
             },
         }
         
@@ -74,9 +70,8 @@ window.onload = function(){
                             y : this.y
                         }
                     ); 
-                    console.log('mybearset');
                 });
-            }
+            },
         });
 
         // 他ユーザーのbearのクラス
@@ -104,7 +99,7 @@ window.onload = function(){
                 label.font = '32px "Arial"';
                 label.text = string;
                 this.addChild(label);
-            }
+            },
         });
         
         // <-- object configuration /-->
@@ -113,36 +108,28 @@ window.onload = function(){
 
         var startScene = new GameScene('Game Start!', 'blue', '#EEE');
         var gameScene = new GameScene('','','#BBB');
+        var bg1 = new Sprite(640, 480);
+        bg1.image = core.assets['pipo-map001.png'];
+        gameScene.addChild(bg1);
         var myBear = new MyBear(0,0);
-        gameScene.addChild(myBear);
-        // bearたちを登録
-        /*bearDataStore.query().done(
-            function(bearData){
-                console.log(bearData);
-                $.each(bearData,function(i, bearDataObj){
-                    bearManager.addBear(bearDataObj);
-                });
-                bearManager.putBears(gameScene);
-           }
-        );*/
+        bearManager.addBear(username, myBear);
+        gameScene.addChild(myBear); 
         startScene.on('touchstart', function(){
             core.pushScene(gameScene);
         });
         core.pushScene(startScene);
+
         bearDataStore.on("set",function(data){
-            if(username != data.id){
-                bear = bearManager.getBear(data.id);
-                console.log(bear);
-                if(bear == undefined){
-                    dataObj={};
-                    dataObj.id=data.id;
-                    dataObj.x=data.value.x;
-                    dataObj.y=data.value.y;
-                    bearManager.addBear(dataObj);
-                }else {
-                    bear.x = data.value.x;
-                    bear.y = data.value.y;
-                }
+            console.log(bearManager);
+            console.log(data.id)
+            bear = bearManager.getBear(data.id);
+            if(bear != undefined){
+                bear.x = data.value.x;
+                bear.y = data.value.y;
+            }else {
+                otherBear = new OtherBear(data.value.x, data.value.y);
+                bearManager.addBear(data.id, otherBear);
+                gameScene.addChild(otherBear);
             }
         });
 	}
