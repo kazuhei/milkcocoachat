@@ -33,22 +33,33 @@ window.onload = function(){
         }
 
         // bearを管理するクラス
-        var bearManager = {
+        var bearBlockManager = {
             bearList: {},
-            addBear: function(username, bearObj){
-                this.bearList[username] = bearObj;
-                console.log('addBear');
-                return bearObj;
+            addBearBlock: function(username, bearBlock){
+                this.bearList[username] = bearBlock;
+                console.log('addBearBlock');
+                return bearBlock;
             },
-            getBear: function(key){
+            getBearBlock: function(key){
                 return this.bearList[key];
             },
-            removeBears: function(scene){
-                $.each(bearList, function(username, bear){
-                    scene.removeChild(bear);
-                });
-            },
         }
+
+        // bearBlockクラス
+        var BearBlock = Class.create(Group, {
+            initialize: function(username, bearObj){
+                Group.call(this);
+                this.bear = bearObj;
+                this.addChild(bearObj);
+                var label = new Label();
+                label.x = 0;
+                label.y = 10;
+                label.font = '12px "Arial"';
+                label.text = username;
+                this.addChild(label);
+            }
+        });
+
         
         // 自分のbearのクラス 
         var MyBear = Class.create(Sprite, {
@@ -57,21 +68,7 @@ window.onload = function(){
                 this.x = x;
                 this.y = y;
                 this.image = core.assets['chara1.png'];
-                this.on('enterframe', function(){
-                    if(core.input.left){this.x -= 5;}
-		    	    if(core.input.right){this.x += 5;}
-			        if(core.input.up){this.y -= 5;}
-    	    		if(core.input.down){this.y += 5;}
-	        		this.frame = this.age % 3;
-                    bearDataStore.child(username).set(
-                        {
-                            name : username,
-                            x : this.x,
-                            y : this.y
-                        }
-                    ); 
-                });
-            },
+                           },
         });
 
         // 他ユーザーのbearのクラス
@@ -136,26 +133,54 @@ window.onload = function(){
         tree3.x = 32*1;
         tree3.y = 32*3;
         gameScene.addChild(tree3);
+        
+        var input = new Entity();
+        input.width = 300;
+        input.height = 20;
+        input.x = 6;
+        input.y = 290;
+        input._element = document.createElement('input');
+        input._element.setAttribute("name","myText");
+        input._element.setAttribute("type","text");
+        gameScene.addChild(input);
 
         var myBear = new MyBear(0,0);
-        bearManager.addBear(username, myBear);
-        gameScene.addChild(myBear); 
+        var myBearBlock = new BearBlock(username, myBear);
+        myBearBlock.on('enterframe', function(){
+            if(core.input.left){this.x -= 5;}
+		    if(core.input.right){this.x += 5;}
+			if(core.input.up){this.y -= 5;}
+    	    if(core.input.down){this.y += 5;}
+	        this.bear.frame = this.age % 3;
+            bearDataStore.child(username).set(
+                {
+                    name : username,
+                    x : this.x,
+                    y : this.y
+                }
+            ); 
+        });
+
+        bearBlockManager.addBearBlock(username, myBearBlock);
+        gameScene.addChild(myBearBlock); 
         startScene.on('touchstart', function(){
             core.pushScene(gameScene);
         });
         core.pushScene(startScene);
 
         bearDataStore.on("set",function(data){
-            console.log(bearManager);
+            console.log(bearBlockManager);
             console.log(data.id)
-            bear = bearManager.getBear(data.id);
-            if(bear != undefined){
-                bear.x = data.value.x;
-                bear.y = data.value.y;
-            }else {
+            bearBlock = bearBlockManager.getBearBlock(data.id);
+            console.log(bearBlock);
+            if(bearBlock != undefined){
+                bearBlock.x = data.value.x;
+                bearBlock.y = data.value.y;
+            } else {
                 otherBear = new OtherBear(data.value.x, data.value.y);
-                bearManager.addBear(data.id, otherBear);
-                gameScene.addChild(otherBear);
+                otherBearBlock = new BearBlock(data.id, otherBear);
+                bearBlockManager.addBearBlock(data.id, otherBearBlock);
+                gameScene.addChild(otherBearBlock);
             }
         });
 	}
