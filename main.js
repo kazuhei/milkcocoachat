@@ -51,12 +51,17 @@ window.onload = function(){
                 Group.call(this);
                 this.bear = bearObj;
                 this.addChild(bearObj);
-                var label = new Label();
-                label.x = 0;
-                label.y = 10;
-                label.font = '12px "Arial"';
-                label.text = username;
-                this.addChild(label);
+                var nameLabel = new Label();
+                nameLabel.y = 32;
+                nameLabel.font = '12px "Arial"';
+                nameLabel.text = username;
+                this.addChild(nameLabel);
+                var commentLabel = new Label();
+                commentLabel.y = -10;
+                commentLabel.font = '14px "Arial"';
+                commentLabel.text = "こんにちは";
+                this.addChild(commentLabel);
+                this.commentLabel = commentLabel;
             }
         });
 
@@ -68,15 +73,13 @@ window.onload = function(){
                 this.x = x;
                 this.y = y;
                 this.image = core.assets['chara1.png'];
-                           },
+            },
         });
 
         // 他ユーザーのbearのクラス
         var OtherBear = Class.create(Sprite, {
             initialize: function(x, y){
                 Sprite.call(this, 32, 32);
-                this.x = x;
-                this.y = y;
                 this.image = core.assets['chara1.png'];
                 this.on('enterframe', function(){
                     this.frame = this.age % 3 + 5;
@@ -142,6 +145,7 @@ window.onload = function(){
         input._element = document.createElement('input');
         input._element.setAttribute("name","myText");
         input._element.setAttribute("type","text");
+        input._element.value = "こんにちは";
         gameScene.addChild(input);
 
         var myBear = new MyBear(0,0);
@@ -152,9 +156,11 @@ window.onload = function(){
 			if(core.input.up){this.y -= 5;}
     	    if(core.input.down){this.y += 5;}
 	        this.bear.frame = this.age % 3;
+            this.commentLabel.text = input._element.value;
             bearDataStore.child(username).set(
                 {
                     name : username,
+                    comment : input._element.value,
                     x : this.x,
                     y : this.y
                 }
@@ -171,14 +177,17 @@ window.onload = function(){
         bearDataStore.on("set",function(data){
             console.log(bearBlockManager);
             console.log(data.id)
+            console.log(data.value.comment);
             bearBlock = bearBlockManager.getBearBlock(data.id);
             console.log(bearBlock);
             if(bearBlock != undefined){
                 bearBlock.x = data.value.x;
                 bearBlock.y = data.value.y;
+                bearBlock.commentLabel.text = data.value.comment;
             } else {
                 otherBear = new OtherBear(data.value.x, data.value.y);
                 otherBearBlock = new BearBlock(data.id, otherBear);
+                otherBearBlock.commentLabel.text = data.value.comment;
                 bearBlockManager.addBearBlock(data.id, otherBearBlock);
                 gameScene.addChild(otherBearBlock);
             }
