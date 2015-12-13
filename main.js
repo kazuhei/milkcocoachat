@@ -1,11 +1,10 @@
 // configuration
-var milkcocoa = new MilkCocoa("https://io-ihyw9k58f.mlkcca.com");
+var milkcocoa = new MilkCocoa("zooii44z3rf.mlkcca.com");
 var bearDataStore = milkcocoa.dataStore("bear");
 
 enchant();
 
 window.onload = function(){
-    console.log('hello enchantjs');
 	var core = new Core(320, 320);
 	core.preload('chara1.png', 'pipo-map001.png');
 	core.fps = 6;
@@ -37,7 +36,6 @@ window.onload = function(){
             bearList: {},
             addBearBlock: function(username, bearBlock){
                 this.bearList[username] = bearBlock;
-                console.log('addBearBlock');
                 return bearBlock;
             },
             getBearBlock: function(key){
@@ -157,7 +155,7 @@ window.onload = function(){
     	    if(core.input.down){this.y += 5;}
 	        this.bear.frame = this.age % 3;
             this.commentLabel.text = input._element.value;
-            bearDataStore.child(username).set(
+            bearDataStore.set(username,
                 {
                     name : username,
                     comment : input._element.value,
@@ -175,11 +173,7 @@ window.onload = function(){
         core.pushScene(startScene);
 
         bearDataStore.on("set",function(data){
-            console.log(bearBlockManager);
-            console.log(data.id)
-            console.log(data.value.comment);
             bearBlock = bearBlockManager.getBearBlock(data.id);
-            console.log(bearBlock);
             if(bearBlock != undefined){
                 bearBlock.x = data.value.x;
                 bearBlock.y = data.value.y;
@@ -192,6 +186,8 @@ window.onload = function(){
                 gameScene.addChild(otherBearBlock);
             }
         });
+
+
 	}
 	core.start();
 };
